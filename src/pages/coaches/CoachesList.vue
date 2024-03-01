@@ -64,9 +64,15 @@ export default {
       return this.$store.getters['coaches/isCoach']
     },
   },
+  created() {
+    this.loadCoaches()
+  },
   methods: {
     setFilters(updatedFilters) {
       this.activeFiters = updatedFilters
+    },
+    loadCoaches() {
+      this.$store.dispatch('coaches/fetchCoaches')
     },
   },
 }
