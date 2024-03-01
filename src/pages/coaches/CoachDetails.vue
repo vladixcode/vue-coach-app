@@ -42,7 +42,6 @@ export default {
       return this.selectedCoach.firstName + ' ' + this.selectedCoach.lastName
     },
     contactLink() {
-      console.log('this.$route.path', this.$route)
       return `/coaches/${this.id}/contact`
     },
     renderContactButton() {
