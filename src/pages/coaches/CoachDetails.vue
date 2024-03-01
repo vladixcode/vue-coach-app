@@ -8,7 +8,7 @@
 
   <section>
     <base-card>
-      <header>
+      <header v-if="renderContactButton">
         <h2>Interested? Reach out now</h2>
         <base-button link :to="contactLink">Contact</base-button>
       </header>
@@ -42,7 +42,11 @@ export default {
       return this.selectedCoach.firstName + ' ' + this.selectedCoach.lastName
     },
     contactLink() {
-      return `${this.$route.path}/${this.id}/contact`
+      console.log('this.$route.path', this.$route)
+      return `/coaches/${this.id}/contact`
+    },
+    renderContactButton() {
+      return this.$route.path === `/coaches/${this.id}`
     },
   },
   created() {
