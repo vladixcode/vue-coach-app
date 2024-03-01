@@ -21,4 +21,23 @@ export default {
       id: userId,
     })
   },
+  async fetchCoaches(context) {
+    const response = await fetch(`https://find-coach-vue-app-test-default-rtdb.firebaseio.com/coaches.json`)
+
+    if (!response.ok) {
+      // error
+    }
+    const responseData = await response.json()
+
+    const coaches = []
+
+    for (const [coachId, coachData] of Object.entries(responseData)) {
+      coaches.push({
+        id: coachId,
+        ...coachData,
+      })
+    }
+
+    context.commit('setCoaches', coaches)
+  },
 }
