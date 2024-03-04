@@ -25,18 +25,22 @@ export default {
     }
   },
   methods: {
-    submitForm() {
+    async submitForm() {
       this.fromIsValid = true
       if (this.email === '' || !this.email.includes('@') || this.message === '') {
         this.fromIsValid = false
         return
       }
 
-      this.$store.dispatch('requests/contactCoach', {
-        coachId: this.$route.params.id,
-        userEmail: this.email,
-        message: this.message,
-      })
+      try {
+        await this.$store.dispatch('requests/contactCoach', {
+          coachId: this.$route.params.id,
+          userEmail: this.email,
+          message: this.message,
+        })
+      } catch (error) {
+        console.error('Error: ', error.message)
+      }
 
       this.$router.replace('/coaches')
     },
