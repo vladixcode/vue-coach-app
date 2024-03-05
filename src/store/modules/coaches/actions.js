@@ -21,7 +21,11 @@ export default {
       id: userId,
     })
   },
-  async fetchCoaches(context) {
+  async fetchCoaches(context, payload) {
+    if (!payload.forceRefresh && !context.getters.shouldUpdate) {
+      return
+    }
+
     const response = await fetch(`https://find-coach-vue-app-test-default-rtdb.firebaseio.com/coaches.json`)
 
     const responseData = await response.json()
@@ -40,5 +44,6 @@ export default {
     }
 
     context.commit('setCoaches', coaches)
+    context.commit('setFetchTimestamp')
   },
 }

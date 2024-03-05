@@ -8,7 +8,7 @@
   <section>
     <base-card>
       <div class="controls">
-        <base-button mode="outline" @click="loadCoaches">Refresh</base-button>
+        <base-button mode="outline" @click="loadCoaches(true)">Refresh</base-button>
         <base-button v-if="!isCoach && !isLoading" to="/register" link>Register as a Coach</base-button>
       </div>
       <div v-if="isLoading">
@@ -79,10 +79,10 @@ export default {
     setFilters(updatedFilters) {
       this.activeFiters = updatedFilters
     },
-    async loadCoaches() {
+    async loadCoaches(forceRefresh = false) {
       this.isLoading = true
       try {
-        await this.$store.dispatch('coaches/fetchCoaches')
+        await this.$store.dispatch('coaches/fetchCoaches', { forceRefresh })
       } catch (error) {
         this.error = error.message
       }
