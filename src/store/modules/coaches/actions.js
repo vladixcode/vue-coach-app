@@ -28,11 +28,10 @@ export default {
 
     const response = await fetch(`https://find-coach-vue-app-test-default-rtdb.firebaseio.com/coaches.json`)
 
-    const responseData = await response.json()
-
     if (!response.ok) {
-      throw new Error(responseData.message || 'Failed to fetch!')
+      throw new Error(response.message || 'Failed to fetch data! Try again later.')
     }
+    const responseData = await response.json()
 
     const coaches = []
 
