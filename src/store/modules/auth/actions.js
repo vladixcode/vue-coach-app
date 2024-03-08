@@ -11,11 +11,15 @@ export default {
       }),
     })
 
-    if (!response.ok) {
-      throw new Error('Failed to authenticate.')
-    }
-
     const responseData = await response.json()
+
+    if (!response.ok) {
+      let errMsg = 'Failed to sign you up. Please check the sign up credentials.'
+      if (responseData.error.message === 'EMAIL_EXISTS') {
+        errMsg = 'The email address you provided is already taken.'
+      }
+      throw new Error(errMsg)
+    }
 
     context.commit('setUser', {
       token: responseData.idToken,
