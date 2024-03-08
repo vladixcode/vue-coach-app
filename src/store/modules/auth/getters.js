@@ -5,7 +5,10 @@ export default {
   token(state) {
     return state.token
   },
-  isAutenticated(state) {
+  isAuthenticated(state) {
     return !!state.token
+  },
+  isAutoLogout(state) {
+    return state.isAutoLogout
   },
 }

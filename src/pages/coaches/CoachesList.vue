@@ -75,7 +75,7 @@ export default {
       return this.$store.getters['coaches/isCoach']
     },
     isLoggedin() {
-      return this.$store.getters['isAutenticated']
+      return this.$store.getters['isAuthenticated']
     },
   },
   created() {

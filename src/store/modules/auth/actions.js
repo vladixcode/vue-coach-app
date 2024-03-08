@@ -3,20 +3,36 @@
  * https://firebase.google.com/support/guides/security-checklist#api-keys-not-secret
  */
 const API_KEY = 'AIzaSyCw0kXFyq3R1LAfeKqSA-UehodTThSDirw'
+let logoutTimer
 
 export default {
-  async login(context, payload) {
-    const response = await fetch(
-      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          email: payload.email,
-          password: payload.password,
-          returnSecureToken: true,
-        }),
-      },
-    )
+  login(context, payload) {
+    return context.dispatch('auth', {
+      ...payload,
+      mode: 'login',
+    })
+  },
+  signup(context, payload) {
+    return context.dispatch('auth', {
+      ...payload,
+      mode: 'signup',
+    })
+  },
+  async auth(context, payload) {
+    const mode = payload.mode
+
+    let endpoint = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`
+    if (mode === 'signup') {
+      endpoint = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`
+    }
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      body: JSON.stringify({
+        email: payload.email,
+        password: payload.password,
+        returnSecureToken: true,
+      }),
+    })
 
     const responseData = await response.json()
 
@@ -36,44 +52,59 @@ export default {
       throw new Error(errMsg)
     }
 
+    const expiresIn = +responseData.expiresIn * 1000
+    // const expiresIn = 5000 // testing
+    const expirationDate = new Date().getTime() + expiresIn
+
+    localStorage.setItem('token', responseData.idToken)
+    localStorage.setItem('userId', responseData.localId)
+    localStorage.setItem('tokenExpiration', expirationDate)
+
+    logoutTimer = setTimeout(() => {
+      context.dispatch('autoLogout')
+    }, expiresIn)
+
     context.commit('setUser', {
       token: responseData.idToken,
       userId: responseData.localId,
-      tokenExpiration: responseData.expiresIn,
     })
   },
-  async signup(context, payload) {
-    const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`, {
-      method: 'POST',
-      body: JSON.stringify({
-        email: payload.email,
-        password: payload.password,
-        returnSecureToken: true,
-      }),
-    })
+  autoLogin(context) {
+    const token = localStorage.getItem('token')
+    const userId = localStorage.getItem('userId')
+    const tokenExpiration = localStorage.getItem('tokenExpiration')
 
-    const responseData = await response.json()
+    const expiresIn = +tokenExpiration - new Date().getTime()
 
-    if (!response.ok) {
-      let errMsg = 'Failed to sign you up. Please check the sign up credentials.'
-
-      if (responseData.error.message === 'EMAIL_EXISTS') {
-        errMsg = 'The email address you provided is already taken.'
-      }
-      throw new Error(errMsg)
+    if (expiresIn < 0) {
+      return
     }
 
-    context.commit('setUser', {
-      token: responseData.idToken,
-      userId: responseData.localId,
-      tokenExpiration: responseData.expiresIn,
-    })
+    logoutTimer = setTimeout(() => {
+      context.dispatch('autoLogout')
+    }, expiresIn)
+
+    if (token && userId) {
+      context.commit('setUser', {
+        token,
+        userId,
+      })
+    }
   },
   logout(context) {
+    localStorage.removeItem('token')
+    localStorage.removeItem('userId')
+    localStorage.removeItem('tokenExpiration')
+
+    clearTimeout(logoutTimer)
+
     context.commit('setUser', {
       userId: null,
       token: null,
-      tokenExpiration: null,
     })
+  },
+  autoLogout(context) {
+    context.dispatch('logout')
+    context.commit('setAutoLogout')
   },
 }

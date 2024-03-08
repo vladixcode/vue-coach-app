@@ -22,7 +22,7 @@
 export default {
   computed: {
     isLoggedin() {
-      return this.$store.getters.isAutenticated
+      return this.$store.getters.isAuthenticated
     },
   },
   methods: {
