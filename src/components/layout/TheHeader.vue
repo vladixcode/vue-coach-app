@@ -28,6 +28,7 @@ export default {
   methods: {
     handleLogout() {
       this.$store.dispatch('logout')
+      this.$router.replace('/coaches')
     },
   },
 }
