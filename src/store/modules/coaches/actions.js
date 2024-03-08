@@ -5,10 +5,15 @@ export default {
       ...data,
     }
 
-    const response = await fetch(`https://find-coach-vue-app-test-default-rtdb.firebaseio.com/coaches/${userId}.json`, {
-      method: 'PUT',
-      body: JSON.stringify(coachData),
-    })
+    const token = context.rootGetters.token
+
+    const response = await fetch(
+      `https://find-coach-vue-app-test-default-rtdb.firebaseio.com/coaches/${userId}.json?auth=${token}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify(coachData),
+      },
+    )
 
     if (!response.ok) {
       // error
