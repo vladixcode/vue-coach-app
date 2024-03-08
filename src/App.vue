@@ -11,6 +11,26 @@ import TheHeader from '@/components/layout/TheHeader.vue'
   </router-view>
 </template>
 
+<script>
+export default {
+  computed: {
+    isAutoLogout() {
+      return this.$store.getters.isAutoLogout
+    },
+  },
+  watch: {
+    isAutoLogout(newValue, oldValue) {
+      if (newValue && newValue !== oldValue) {
+        this.$router.replace('/coaches')
+      }
+    },
+  },
+  created() {
+    this.$store.dispatch('autoLogin')
+  },
+}
+</script>
+
 <style scoped>
 .route-enter-from {
   opacity: 0;
