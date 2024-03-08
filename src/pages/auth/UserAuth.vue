@@ -1,19 +1,27 @@
 <template>
-  <base-card>
-    <form @submit.prevent="submitForm">
-      <div class="form-control">
-        <label for="email">Email</label>
-        <input id="email" v-model.trim="email" type="email" />
-      </div>
-      <div class="form-control">
-        <label for="password">Password</label>
-        <input id="password" v-model.trim="password" type="password" />
-      </div>
-      <p v-if="!formIsValid">Please enter a valid email and password (must be at least 5 characters)</p>
-      <base-button>{{ submitButtonCaption }}</base-button>
-      <base-button type="button" mode="flat" @click="switchAuthMode">{{ switchModeButtonCaption }}</base-button>
-    </form>
-  </base-card>
+  <div>
+    <base-dialog :show="!!error" title="An error occured" @close="handleError">
+      <p>{{ error }}</p>
+    </base-dialog>
+    <base-dialog fixed :show="isLoading" title="Authenticating...">
+      <base-spinner></base-spinner>
+    </base-dialog>
+    <base-card>
+      <form @submit.prevent="submitForm">
+        <div class="form-control">
+          <label for="email">Email</label>
+          <input id="email" v-model.trim="email" type="email" />
+        </div>
+        <div class="form-control">
+          <label for="password">Password</label>
+          <input id="password" v-model.trim="password" type="password" />
+        </div>
+        <p v-if="!formIsValid">Please enter a valid email and password (must be at least 5 characters)</p>
+        <base-button>{{ submitButtonCaption }}</base-button>
+        <base-button type="button" mode="flat" @click="switchAuthMode">{{ switchModeButtonCaption }}</base-button>
+      </form>
+    </base-card>
+  </div>
 </template>
 
 <script>
@@ -24,6 +32,8 @@ export default {
       password: '',
       formIsValid: true,
       mode: 'login',
+      isLoading: false,
+      error: null,
     }
   },
   computed: {
@@ -43,21 +53,29 @@ export default {
     },
   },
   methods: {
-    submitForm() {
+    async submitForm() {
       this.formIsValid = true
       if (this.email === '' || !this.email.includes('@') || this.password.length < 6) {
         this.formIsValid = false
         return
       }
 
-      if (this.mode === 'login') {
-        // ....
-      } else {
-        this.$store.dispatch('signup', {
-          email: this.email,
-          password: this.password,
-        })
+      this.isLoading = true
+
+      try {
+        if (this.mode === 'login') {
+          // ....
+        } else {
+          await this.$store.dispatch('signup', {
+            email: this.email,
+            password: this.password,
+          })
+        }
+      } catch (error) {
+        this.error = error.message
       }
+
+      this.isLoading = false
 
       // Send HTTP request
     },
@@ -67,6 +85,9 @@ export default {
       } else {
         this.mode = 'login'
       }
+    },
+    handleError() {
+      this.error = null
     },
   },
 }
