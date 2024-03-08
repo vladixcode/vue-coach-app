@@ -7,7 +7,7 @@
       </div>
       <div class="form-control">
         <label for="password">Password</label>
-        <input id="password" v-model.trim="email" type="password" />
+        <input id="password" v-model.trim="password" type="password" />
       </div>
       <p v-if="!formIsValid">Please enter a valid email and password (must be at least 5 characters)</p>
       <base-button>{{ submitButtonCaption }}</base-button>
@@ -48,6 +48,15 @@ export default {
       if (this.email === '' || !this.email.includes('@') || this.password.length < 6) {
         this.formIsValid = false
         return
+      }
+
+      if (this.mode === 'login') {
+        // ....
+      } else {
+        this.$store.dispatch('signup', {
+          email: this.email,
+          password: this.password,
+        })
       }
 
       // Send HTTP request
