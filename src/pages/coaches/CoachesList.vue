@@ -10,7 +10,7 @@
       <base-card>
         <div class="controls">
           <base-button mode="outline" @click="loadCoaches(true)">Refresh</base-button>
-          <base-button v-if="!isLoggedin" link to="/auth">Login</base-button>
+          <base-button v-if="!isLoggedin" link to="/auth?redirect=register"> Login to Register as a Coach </base-button>
           <base-button v-if="isLoggedin && !isCoach && !isLoading" to="/register" link>Register as a Coach</base-button>
         </div>
         <div v-if="isLoading">
